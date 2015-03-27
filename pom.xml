@@ -6,7 +6,35 @@
 
     <groupId>com.bitmoving.util</groupId>
     <artifactId>flowdock-appender</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
+
+    <name>flowdock-appender</name>
+    <description>https://github.com/bkittelmann/flowdock-appender</description>
+    <url>Logback appender that sends messages to Flowdock</url>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Benno Kittelmann</name>
+            <email>...</email>
+            <organization>bitmoving</organization>
+            <organizationUrl>https://github.com/bkittelmann</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git@github.com:bkittelmann/flowdock-appender.git</connection>
+        <url>scm:git@github.com:bkittelmann/flowdock-appender.git</url>
+        <developerConnection>scm:git@github.com:bkittelmann/flowdock-appender.git</developerConnection>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -40,21 +68,39 @@
         </dependency>
     </dependencies>
 
-     <build>
-      <plugins>
-        <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-            <execution>
-                <id>attach-sources</id>
-                <goals>
-                    <goal>jar</goal>
-                </goals>
-            </execution>
-        </executions>
-       </plugin>
-     </plugins>
-  </build>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.2</version>
+                <executions>
+                    <execution>
+                        <id>package-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
