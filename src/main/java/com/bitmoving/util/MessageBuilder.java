@@ -3,6 +3,8 @@ package com.bitmoving.util;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.encoder.Encoder;
+import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.slf4j.Marker;
@@ -18,12 +20,12 @@ public class MessageBuilder {
     // set through configuration
     private final String flowToken;
     private final String author;
-    private final PatternLayoutEncoder encoder;
+    private final LayoutWrappingEncoder encoder;
 
     // used only within
     private final Map<Level, String> statusColors = new HashMap<Level, String>();
 
-    public MessageBuilder(String flowToken, String author, PatternLayoutEncoder encoder) {
+    public MessageBuilder(String flowToken, String author, LayoutWrappingEncoder encoder) {
         this.flowToken = flowToken;
         this.author = author;
         this.encoder = encoder;
