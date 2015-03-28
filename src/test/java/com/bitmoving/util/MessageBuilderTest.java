@@ -8,7 +8,6 @@ import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
@@ -16,7 +15,6 @@ import org.slf4j.MarkerFactory;
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class MessageBuilderTest {
@@ -47,7 +45,6 @@ public class MessageBuilderTest {
         MessageBuilder builder = new MessageBuilder("token", "author", encoder);
 
         JsonObject message = builder.buildMessage(event);
-        System.out.println("message = " + message);
         JsonValue fields = message.get("thread").asObject().get("fields");
 
         assertThat(fields.asArray().size(), equalTo(1));
@@ -56,6 +53,18 @@ public class MessageBuilderTest {
 
         assertThat(field.get("label").asString(), equalTo("Marker"));
         assertThat(field.get("value").asString(), equalTo(marker.getName()));
+    }
+
+    @Test
+    public void convert_log_level_to_status() throws IOException {
+        LoggingEvent event = new LoggingEvent("", logger, Level.ERROR, "", null, null);
+        MessageBuilder builder = new MessageBuilder("token", "author", encoder);
+
+        JsonObject message = builder.buildMessage(event);
+        JsonObject status = message.get("thread").asObject().get("status").asObject();
+
+        assertThat(status.get("value").asString(), equalTo("error"));
+        assertThat(status.get("color").asString(), equalTo("red"));
     }
 
     private LayoutWrappingEncoder setupEncoder() {
