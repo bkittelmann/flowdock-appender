@@ -97,6 +97,8 @@ public class MessageBuilder {
         statusColors.put(Level.ERROR, "red");
         statusColors.put(Level.WARN, "orange");
         statusColors.put(Level.INFO, "yellow");
+        statusColors.put(Level.DEBUG, "grey");
+        statusColors.put(Level.TRACE, "grey");
     }
 
     private String serialize(JsonObject json) throws IOException {
