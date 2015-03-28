@@ -38,7 +38,7 @@ public class MessageBuilder {
         return serialize(json);
     }
 
-    private JsonObject buildMessage(ILoggingEvent event) throws IOException {
+    public JsonObject buildMessage(ILoggingEvent event) throws IOException {
         JsonObject message = new JsonObject();
         message.add("flow_token", flowToken);
         message.add("event", "activity");
