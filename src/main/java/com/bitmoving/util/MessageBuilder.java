@@ -1,9 +1,7 @@
 package com.bitmoving.util;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.encoder.Encoder;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -62,7 +60,7 @@ public class MessageBuilder {
         JsonObject thread = new JsonObject();
         thread.add("title", event.getFormattedMessage());
         thread.add("fields", buildFields(event));
-        thread.add("body", "<pre>" + encoder.getLayout().doLayout(event) + "</pre>");
+        thread.add("body", encoder.getLayout().doLayout(event));
         thread.add("external_url", "http://example.org/test");
         buildStatus(event, thread);
         return thread;
