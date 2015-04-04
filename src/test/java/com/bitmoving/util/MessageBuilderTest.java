@@ -3,6 +3,7 @@ package com.bitmoving.util;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
@@ -62,6 +63,20 @@ public class MessageBuilderTest {
 
         JsonObject message = builder.buildMessage(event);
         JsonObject status = message.get("thread").asObject().get("status").asObject();
+
+        assertThat(status.get("value").asString(), equalTo("error"));
+        assertThat(status.get("color").asString(), equalTo("red"));
+    }
+
+    @Test
+    public void format_exception_in_body() throws IOException {
+        LoggingEvent event = new LoggingEvent("", logger, Level.ERROR, "", new RuntimeException("test"), null);
+        MessageBuilder builder = new MessageBuilder("token", "author", encoder);
+
+        JsonObject message = builder.buildMessage(event);
+        JsonObject status = message.get("thread").asObject().get("status").asObject();
+
+        System.out.println(message);
 
         assertThat(status.get("value").asString(), equalTo("error"));
         assertThat(status.get("color").asString(), equalTo("red"));
