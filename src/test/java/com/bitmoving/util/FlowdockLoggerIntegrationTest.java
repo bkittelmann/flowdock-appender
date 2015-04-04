@@ -4,6 +4,7 @@ package com.bitmoving.util;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
@@ -87,9 +88,10 @@ public class FlowdockLoggerIntegrationTest {
     }
 
     private LayoutWrappingEncoder createEncoder() {
+        PatternLayout.defaultConverterMap.put("linkex", LinkingExceptionConverter.class.getName());
         PatternLayoutEncoder encoder = new PatternLayoutEncoder();
         encoder.setContext(context);
-        encoder.setPattern("[%thread] %-5level %logger{40} - %msg %n");
+        encoder.setPattern("[%thread] %-5level %logger{40} - %msg %n %linkex");
         encoder.start();
         return encoder;
     }
