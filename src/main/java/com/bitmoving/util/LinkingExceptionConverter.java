@@ -1,7 +1,6 @@
 package com.bitmoving.util;
 
 
-import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.pattern.ThrowableHandlingConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
@@ -30,20 +29,15 @@ public class LinkingExceptionConverter extends ThrowableHandlingConverter {
                     String methodName = step.getStackTraceElement().getMethodName();
                     int lineNumber = step.getStackTraceElement().getLineNumber();
 
-                    String replacement = "." + fileName + "#L" + lineNumber; //"%s %s".format(step.getStackTraceElement().getFileName(), step.getStackTraceElement().getLineNumber());
-                    System.out.println("Replacaement: " + replacement);
+                    String replacement = "." + fileName + "#L" + lineNumber;
                     String result = className.replace(".", "/"). replaceAll("/\\w+$", replacement);
-                    System.out.println(result);
                     builder.append(String.format("<br/>at %s.%s(<a href=\"%s\">%s</a>)", className, methodName, base + result, fileName + ":" + lineNumber));
                 } else {
                     builder.append("<br/>" + step.getSTEAsString());
                 }
-
             }
-
             return builder.toString();
         }
-
         return "";
     }
 }
