@@ -3,6 +3,7 @@ package com.bitmoving.util;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
+import ch.qos.logback.core.spi.ContextAware;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.slf4j.Marker;
@@ -30,13 +31,12 @@ public class MessageBuilder {
         initStatusColor();
     }
 
-    public String build(ILoggingEvent event) throws IOException {
-        event.getFormattedMessage();
+    public String build(ILoggingEvent event) {
         JsonObject json = buildMessage(event);
-        return serialize(json);
+        return json.toString();
     }
 
-    public JsonObject buildMessage(ILoggingEvent event) throws IOException {
+    public JsonObject buildMessage(ILoggingEvent event) {
         JsonObject message = new JsonObject();
         message.add("flow_token", flowToken);
         message.add("event", "activity");
@@ -97,12 +97,5 @@ public class MessageBuilder {
         statusColors.put(Level.INFO, "yellow");
         statusColors.put(Level.DEBUG, "grey");
         statusColors.put(Level.TRACE, "grey");
-    }
-
-    private String serialize(JsonObject json) throws IOException {
-        StringWriter writer = new StringWriter();
-        json.writeTo(writer);
-        writer.close();
-        return writer.getBuffer().toString();
     }
 }

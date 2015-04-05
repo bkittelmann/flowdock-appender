@@ -46,12 +46,8 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     protected void append(ILoggingEvent event) {
-        try {
-            String message = builder.build(event);
-            sender.sendRequest(message);
-        } catch (IOException e) {
-            addError("Could not build message", e);
-        }
+        String message = builder.build(event);
+        sender.sendRequest(message);
     }
 
     public String getAuthor() {
