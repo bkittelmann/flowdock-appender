@@ -27,7 +27,7 @@ public class MessageBuilderTest {
     public void basic_fields_are_set_on_message() throws IOException {
         String token = "token";
         String author = "author";
-        MessageBuilder builder = new MessageBuilder(token, author, encoder);
+        MessageBuilder builder = new MessageBuilder(token, author, encoder, 30);
 
         LoggingEvent event = new LoggingEvent("", logger, Level.DEBUG, "a log message", null, null);
         JsonObject message = builder.buildMessage(event);
@@ -42,7 +42,7 @@ public class MessageBuilderTest {
         LoggingEvent event = new LoggingEvent("", logger, Level.ALL, "a log message", null, null);
         event.setMarker(marker);
 
-        MessageBuilder builder = new MessageBuilder("token", "author", encoder);
+        MessageBuilder builder = new MessageBuilder("token", "author", encoder, 30);
 
         JsonObject message = builder.buildMessage(event);
         JsonValue fields = message.get("thread").asObject().get("fields");
@@ -58,13 +58,24 @@ public class MessageBuilderTest {
     @Test
     public void convert_log_level_to_status() throws IOException {
         LoggingEvent event = new LoggingEvent("", logger, Level.ERROR, "", null, null);
-        MessageBuilder builder = new MessageBuilder("token", "author", encoder);
+        MessageBuilder builder = new MessageBuilder("token", "author", encoder, 30);
 
         JsonObject message = builder.buildMessage(event);
         JsonObject status = message.get("thread").asObject().get("status").asObject();
 
         assertThat(status.get("value").asString(), equalTo("error"));
         assertThat(status.get("color").asString(), equalTo("red"));
+    }
+
+    @Test
+    public void trim_thread_title() throws IOException {
+        LoggingEvent event = new LoggingEvent("", logger, Level.ERROR, "here are many chars", null, null);
+        MessageBuilder builder = new MessageBuilder("token", "author", encoder, 10);
+
+        JsonObject message = builder.buildMessage(event);
+        String title = message.get("thread").asObject().get("title").asString();
+
+        assertThat(title, equalTo("here are m[..]"));
     }
 
     private LayoutWrappingEncoder setupEncoder() {
