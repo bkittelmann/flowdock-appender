@@ -32,11 +32,12 @@ public class FlowdockLoggerIntegrationTest {
     private static final OutputStream defaultErr = System.err;
     private static final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
 
-    private final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    private static final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
     @BeforeClass
     public static void init() {
         System.setErr(new PrintStream(myOut));
+        context.getLogger(Logger.ROOT_LOGGER_NAME).setLevel(Level.ERROR);
     }
 
     @Test

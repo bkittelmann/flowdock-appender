@@ -2,16 +2,19 @@ package com.bitmoving.util;
 
 import ch.qos.logback.core.spi.ContextAware;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+import com.ning.http.client.providers.jdk.JDKAsyncHttpProvider;
 
 import java.util.concurrent.ExecutionException;
 
 public class MessageSender {
     private final String endpoint;
     private final ContextAware appender;
-    private final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+
+    private final AsyncHttpClient client = new AsyncHttpClient(new JDKAsyncHttpProvider(new AsyncHttpClientConfig.Builder().build()));
 
     public MessageSender(String endpoint, ContextAware appender) {
         this.endpoint = endpoint;
@@ -27,7 +30,7 @@ public class MessageSender {
                     .addHeader("Content-Type", "application/json")
                     .build();
 
-            Response response = asyncHttpClient.executeRequest(request).get();
+            Response response = client.executeRequest(request).get();
             int statusCode = response.getStatusCode();
             if (statusCode > 299) {
                 appender.addError(String.format("Could not store in flowdock: %s %s", statusCode, response.getStatusText()));
@@ -40,6 +43,6 @@ public class MessageSender {
     }
 
     public void close() {
-        asyncHttpClient.close();
+        client.close();
     }
 }
