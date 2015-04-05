@@ -6,6 +6,7 @@ import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import ch.qos.logback.core.spi.ContextAware;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import org.slf4j.Marker;
 
 import java.io.IOException;
@@ -20,14 +21,16 @@ public class MessageBuilder {
     private final String flowToken;
     private final String author;
     private final LayoutWrappingEncoder encoder;
+    private final int maxTitleChars;
 
     // used only within
     private final Map<Level, String> statusColors = new HashMap<Level, String>();
 
-    public MessageBuilder(String flowToken, String author, LayoutWrappingEncoder encoder) {
+    public MessageBuilder(String flowToken, String author, LayoutWrappingEncoder encoder, int maxTitleChars) {
         this.flowToken = flowToken;
         this.author = author;
         this.encoder = encoder;
+        this.maxTitleChars = maxTitleChars;
         initStatusColor();
     }
 
@@ -58,12 +61,18 @@ public class MessageBuilder {
 
     private JsonObject buildThread(ILoggingEvent event) {
         JsonObject thread = new JsonObject();
-        thread.add("title", event.getFormattedMessage());
+        thread.add("title", buildThreadTitle(event));
         thread.add("fields", buildFields(event));
         thread.add("body", encoder.getLayout().doLayout(event));
         thread.add("external_url", "http://example.org/test");
         buildStatus(event, thread);
         return thread;
+    }
+
+    private String buildThreadTitle(ILoggingEvent event) {
+        String message = event.getFormattedMessage();
+        int trimAt = Math.min(message.length(), maxTitleChars);
+        return event.getFormattedMessage().substring(0, trimAt) + "[..]";
     }
 
     private JsonArray buildFields(ILoggingEvent event) {
