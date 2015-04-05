@@ -6,7 +6,7 @@
 
     <groupId>com.bitmoving.util</groupId>
     <artifactId>flowdock-appender</artifactId>
-    <version>0.1.2</version>
+    <version>0.2-SNAPSHOT</version>
 
     <name>flowdock-appender</name>
     <description>https://github.com/bkittelmann/flowdock-appender</description>
