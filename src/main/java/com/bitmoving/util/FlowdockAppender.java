@@ -19,6 +19,7 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
     private String flowToken;
     private String apiEndpoint = DEFAULT_ENDPOINT;
     private String author;
+    private int maxTitleChars = 50;
 
     @Override
     public void start() {
@@ -30,7 +31,7 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
         try {
             encoder.init(System.out);
             sender = new MessageSender(apiEndpoint, this);
-            builder = new MessageBuilder(flowToken, author, encoder);
+            builder = new MessageBuilder(flowToken, author, encoder, maxTitleChars);
         } catch (IOException e) {
             addError("Exception when initializing encoder", e);
         }
@@ -80,5 +81,14 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
     public void setApiEndpoint(String apiEndpoint) {
         this.apiEndpoint = apiEndpoint;
+    }
+
+
+    public int getMaxTitleChars() {
+        return maxTitleChars;
+    }
+
+    public void setMaxTitleChars(int maxTitleChars) {
+        this.maxTitleChars = maxTitleChars;
     }
 }
