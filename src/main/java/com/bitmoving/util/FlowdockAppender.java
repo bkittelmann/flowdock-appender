@@ -1,24 +1,19 @@
 package com.bitmoving.util;
 
 
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
-import ch.qos.logback.core.util.StatusPrinter;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
     public static final String DEFAULT_ENDPOINT = "https://api.flowdock.com/messages";
 
     // not configurable from logback config
-    final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    private MessageSender sender;
+    private MessageBuilder builder;
+
     // configurable through logback config
     private LayoutWrappingEncoder encoder;
     private String flowToken;
@@ -34,6 +29,8 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
         try {
             encoder.init(System.out);
+            sender = new MessageSender(apiEndpoint, this);
+            builder = new MessageBuilder(flowToken, author, encoder);
         } catch (IOException e) {
             addError("Exception when initializing encoder", e);
         }
@@ -43,13 +40,18 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     public void stop() {
-        asyncHttpClient.close();
+        sender.close();
         super.stop();
     }
 
     @Override
     protected void append(ILoggingEvent event) {
-        sendRequest(event);
+        try {
+            String message = builder.build(event);
+            sender.sendRequest(message);
+        } catch (IOException e) {
+            addError("Could not build message", e);
+        }
     }
 
     public String getAuthor() {
@@ -82,34 +84,5 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
     public void setApiEndpoint(String apiEndpoint) {
         this.apiEndpoint = apiEndpoint;
-    }
-
-    private String buildJson(ILoggingEvent event) throws IOException {
-        return new MessageBuilder(flowToken, author, encoder).build(event);
-    }
-
-    protected void sendRequest(ILoggingEvent event) {
-        try {
-            String json = buildJson(event);
-
-            RequestBuilder requestBuilder = new RequestBuilder("POST");
-            Request request = requestBuilder
-                .setUrl(apiEndpoint)
-                .setBody(json)
-                .addHeader("Content-Type", "application/json")
-                .build();
-
-            Response response = asyncHttpClient.executeRequest(request).get();
-            int statusCode = response.getStatusCode();
-            if (statusCode > 299) {
-                addError(String.format("Could not store in flowdock: %s %s", statusCode, response.getStatusText()));
-            }
-        } catch (IOException e) {
-            addError("Could not send request to Flowdock", e);
-        } catch (InterruptedException e) {
-            addError("Exception while sending message", e);
-        } catch (ExecutionException e) {
-            addError("Exception while sending message", e);
-        }
     }
 }
