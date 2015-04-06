@@ -1,48 +1,42 @@
 package com.bitmoving.util;
 
 import ch.qos.logback.core.spi.ContextAware;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
-import com.ning.http.client.providers.jdk.JDKAsyncHttpProvider;
 
-import java.util.concurrent.ExecutionException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
 
 public class MessageSender {
-    private final String endpoint;
+    private final URL endpoint;
     private final ContextAware appender;
 
-    private final AsyncHttpClient client = new AsyncHttpClient(new JDKAsyncHttpProvider(new AsyncHttpClientConfig.Builder().build()));
-
-    public MessageSender(String endpoint, ContextAware appender) {
+    public MessageSender(URL endpoint, ContextAware appender) {
         this.endpoint = endpoint;
         this.appender = appender;
     }
 
     public void sendRequest(String json) {
         try {
-            RequestBuilder requestBuilder = new RequestBuilder("POST");
-            Request request = requestBuilder
-                    .setUrl(endpoint)
-                    .setBody(json)
-                    .addHeader("Content-Type", "application/json")
-                    .build();
+            HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
 
-            Response response = client.executeRequest(request).get();
-            int statusCode = response.getStatusCode();
+            connection.setRequestMethod("POST");
+            connection.addRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            OutputStream output = connection.getOutputStream();
+            output.write(json.getBytes(Charset.forName("UTF-8")));
+            output.close();
+
+            int statusCode = connection.getResponseCode();
             if (statusCode > 299) {
-                appender.addError(String.format("Could not store in flowdock: %s %s", statusCode, response.getStatusText()));
+                appender.addError(String.format("Could not store in Flowdock: %s %s", statusCode, connection.getResponseMessage()));
             }
-        } catch (InterruptedException e) {
-            appender.addError("Exception while sending message", e);
-        } catch (ExecutionException e) {
-            appender.addError("Exception while sending message", e);
+            connection.disconnect();
+        } catch (IOException e) {
+            appender.addError("Could not send message", e);
+            e.printStackTrace();
         }
-    }
-
-    public void close() {
-        client.close();
     }
 }
