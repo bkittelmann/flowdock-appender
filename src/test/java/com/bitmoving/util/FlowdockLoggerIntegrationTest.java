@@ -53,6 +53,7 @@ public class FlowdockLoggerIntegrationTest {
         Status status = statusList.get(0);
         assertTrue(status.getOrigin().getClass() == FlowdockAppender.class);
         assertThat(status.getMessage(), containsString("Exception while sending message"));
+        appender.stop();
     }
 
     @AfterClass
@@ -67,6 +68,7 @@ public class FlowdockLoggerIntegrationTest {
         appender.setFlowToken("token");
         appender.setAuthor("author");
         appender.setEncoder(createEncoder());
+        appender.setMaxTitleChars(40);
         appender.setName("FLOWDOCK");
         appender.setContext(context);
         appender.start();
