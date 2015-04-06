@@ -6,6 +6,8 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
     public static final String DEFAULT_ENDPOINT = "https://api.flowdock.com/messages";
@@ -30,19 +32,15 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
         try {
             encoder.init(System.out);
-            sender = new MessageSender(apiEndpoint, this);
+            sender = new MessageSender(new URL(apiEndpoint), this);
             builder = new MessageBuilder(flowToken, author, encoder, maxTitleChars);
+        }  catch (MalformedURLException e) {
+            addError("Could not parse endpoint URL", e);
         } catch (IOException e) {
             addError("Exception when initializing encoder", e);
         }
 
         super.start();
-    }
-
-    @Override
-    public void stop() {
-        sender.close();
-        super.stop();
     }
 
     @Override
