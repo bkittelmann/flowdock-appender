@@ -52,7 +52,7 @@ public class FlowdockLoggerIntegrationTest {
 
         Status status = statusList.get(0);
         assertTrue(status.getOrigin().getClass() == FlowdockAppender.class);
-        assertThat(status.getMessage(), containsString("Exception while sending message"));
+        assertThat(status.getMessage(), containsString("Could not send message"));
     }
 
     @AfterClass
