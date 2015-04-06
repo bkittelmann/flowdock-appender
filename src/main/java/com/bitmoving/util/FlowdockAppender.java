@@ -30,6 +30,11 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
             return;
         }
 
+        if (this.author == null) {
+            addError("No author set. Please check your logback configuration for the field <author>");
+            return;
+        }
+
         try {
             encoder.init(System.out);
             sender = new MessageSender(new URL(apiEndpoint), this);
