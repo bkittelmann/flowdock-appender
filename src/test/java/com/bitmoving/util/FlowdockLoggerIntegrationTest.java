@@ -10,7 +10,7 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusListenerAsList;
-import org.junit.Ignore;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +22,8 @@ import static org.junit.Assert.assertTrue;
 
 public class FlowdockLoggerIntegrationTest {
 
-    private static final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-
     @Test
-    public void status_stored_on_error_while_sending() {
+    public void status_stored_on_error_while_sending() throws InterruptedException {
         LoggerContext context = new LoggerContext();
         StatusListenerAsList statusListener = trackStatusWithListener(context);
 
@@ -38,6 +36,9 @@ public class FlowdockLoggerIntegrationTest {
         appender.setContext(context);
         appender.start();
 
+        // execute the request threads on same thread as JUnit test
+        appender.getMessageSender().setExecutorService(MoreExecutors.newDirectExecutorService());
+
         Logger logger = loggerWithAppender(appender);
         logger.error("message", new RuntimeException("ouch"));
 
@@ -47,6 +48,7 @@ public class FlowdockLoggerIntegrationTest {
         Status status = statusList.get(0);
         assertTrue(status.getOrigin().getClass() == FlowdockAppender.class);
         assertThat(status.getMessage(), containsString("Could not send message"));
+        appender.stop();
     }
 
     @Test
@@ -71,18 +73,7 @@ public class FlowdockLoggerIntegrationTest {
         Status status = statusList.get(0);
         assertTrue(status.getOrigin().getClass() == FlowdockAppender.class);
         assertThat(status.getMessage(), containsString("No author set"));
-    }
-
-    private FlowdockAppender startAppender(String endpoint, LoggerContext context) {
-        FlowdockAppender appender = new FlowdockAppender();
-        appender.setApiEndpoint(endpoint);
-        appender.setFlowToken("token");
-        appender.setAuthor("author");
-        appender.setEncoder(createEncoder(context));
-        appender.setName("FLOWDOCK");
-        appender.setContext(context);
-        appender.start();
-        return appender;
+        appender.stop();
     }
 
     private Logger loggerWithAppender(Appender<ILoggingEvent> appender) {
