@@ -92,12 +92,16 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
         this.apiEndpoint = apiEndpoint;
     }
 
-
     public int getMaxTitleChars() {
         return maxTitleChars;
     }
 
     public void setMaxTitleChars(int maxTitleChars) {
         this.maxTitleChars = maxTitleChars;
+    }
+
+    // should be only access by tests
+    MessageSender getMessageSender() {
+        return sender;
     }
 }
