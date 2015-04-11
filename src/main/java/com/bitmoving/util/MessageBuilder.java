@@ -71,8 +71,10 @@ public class MessageBuilder {
 
     private String buildThreadTitle(ILoggingEvent event) {
         String message = event.getFormattedMessage();
-        int trimAt = Math.min(message.length(), maxTitleChars);
-        return event.getFormattedMessage().substring(0, trimAt) + "[..]";
+        if (message.length() > maxTitleChars) {
+            return event.getFormattedMessage().substring(0, maxTitleChars) + "[..]";
+        }
+        return event.getFormattedMessage();
     }
 
     private JsonArray buildFields(ILoggingEvent event) {
