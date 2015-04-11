@@ -54,6 +54,12 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
         sender.sendRequest(message);
     }
 
+    @Override
+    public void stop() {
+        if (sender != null) sender.stop();
+        super.stop();
+    }
+
     public String getAuthor() {
         return author;
     }
