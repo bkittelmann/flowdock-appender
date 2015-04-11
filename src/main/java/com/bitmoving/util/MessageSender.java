@@ -10,9 +10,10 @@ import java.util.concurrent.TimeUnit;
 public class MessageSender {
     private final URL endpoint;
     private final ContextAware appender;
-    private ExecutorService executor =  Executors.newFixedThreadPool(10);
+    private ExecutorService executor;
 
-    public MessageSender(URL endpoint, ContextAware appender) {
+    public MessageSender(ExecutorService executor, URL endpoint, ContextAware appender) {
+        this.executor = executor;
         this.endpoint = endpoint;
         this.appender = appender;
     }

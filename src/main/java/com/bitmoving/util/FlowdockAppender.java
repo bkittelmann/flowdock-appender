@@ -8,6 +8,7 @@ import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.Executors;
 
 public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
     public static final String DEFAULT_ENDPOINT = "https://api.flowdock.com/messages";
@@ -22,6 +23,7 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
     private String apiEndpoint = DEFAULT_ENDPOINT;
     private String author;
     private int maxTitleChars = 50;
+    private int maxRequestThreads = 10;
 
     @Override
     public void start() {
@@ -37,7 +39,7 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
         try {
             encoder.init(System.out);
-            sender = new MessageSender(new URL(apiEndpoint), this);
+            sender = new MessageSender(Executors.newFixedThreadPool(maxRequestThreads), new URL(apiEndpoint), this);
             builder = new MessageBuilder(flowToken, author, encoder, maxTitleChars);
         }  catch (MalformedURLException e) {
             addError("Could not parse endpoint URL", e);
@@ -98,6 +100,14 @@ public class FlowdockAppender extends AppenderBase<ILoggingEvent> {
 
     public void setMaxTitleChars(int maxTitleChars) {
         this.maxTitleChars = maxTitleChars;
+    }
+
+    public int getMaxRequestThreads() {
+        return maxRequestThreads;
+    }
+
+    public void setMaxRequestThreads(int maxRequestThreads) {
+        this.maxRequestThreads = maxRequestThreads;
     }
 
     // should be only access by tests
