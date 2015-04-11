@@ -11,7 +11,9 @@ import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusListenerAsList;
 import com.google.common.util.concurrent.MoreExecutors;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.StandardOutputStreamLog;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
@@ -19,8 +21,12 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.contrib.java.lang.system.LogMode.LOG_ONLY;
 
 public class FlowdockLoggerIntegrationTest {
+
+    @Rule
+    public final StandardOutputStreamLog log = new StandardOutputStreamLog(LOG_ONLY);
 
     @Test
     public void status_stored_on_error_while_sending() throws InterruptedException {
