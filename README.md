@@ -42,7 +42,10 @@ Show complete logback file:
 Appender configuration
 
 
-## Integrate with Flowdock
+## Installation to Flowdock
 
-Use the script to get a token id
-Set token id on
+The log messages arrive in Flowdock through an **Integration**. There is a general [Integration guide](https://www.flowdock.com/api/integration-guide)
+available which explains the concepts behind it. What you need to obtain is a *flow token*. It's easiest done by 
+executing their interactive helper script [flowdock-oauth.rb](https://raw.githubusercontent.com/flowdock/flowdock-example-integration/master/flowdock-oauth.rb).
+
+At the end of that script, you should be able to select the flows you want to create flow tokens for.
